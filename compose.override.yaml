@@ -1,0 +1,5 @@
+# services:
+#   kube_news:
+#     image: gioufop/kube-news:v3
+#     ports:
+#       - 8181:8181
