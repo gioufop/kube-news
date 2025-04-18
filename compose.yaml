@@ -1,0 +1,41 @@
+services:
+  postgre:
+    image: postgres:12.17
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_PASSWORD: Pg123
+      POSTGRES_USER: kubenews
+      POSTGRES_DB: kubenews
+    volumes:
+      # - ./postgre_vol:/var/lib/postgresql/data  (create a directory at the root of the project and use bind mount)
+      - postgre_docker_vol:/var/lib/postgresql/data # use docker managed volume
+    networks:
+      - kube_news_net
+
+  kube_news:
+    # image: kubedevio/kube-news:v1
+    image: gioufop/kube-news
+    build:
+      context: ./src
+      dockerfile: Dockerfile
+    ports:
+      - 8080:8080
+    networks:
+      - kube_news_net
+    depends_on:
+      - postgre
+    environment:
+      DB_HOST: postgre # kube_news_db # I can also put the service name: postgre
+      # DB_PORT: 5433
+      DB_USERNAME: kubenews
+      DB_PASSWORD: Pg123
+      DB_DATABASE: kubenews
+
+
+volumes:
+  postgre_docker_vol:
+    # external: true # if you want to use a named volume that is not managed by docker, you can set external to true
+networks:
+  kube_news_net:
+    driver: bridge
